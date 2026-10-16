@@ -80,29 +80,63 @@ namespace CosmeticArmor
             }
         }
 
+        // each slot's tag and its parts, found once, so the every-frame update looks nothing up and builds no text
+        private class Tag
+        {
+            internal InventoryElement Element;
+            internal Transform Button;
+            internal TMP_Text Text;
+            internal Image Background;
+            internal UITooltip Tooltip;
+            internal Look Shown;
+        }
+
+        private static readonly Tag[] Tags = new Tag[CosmeticSlots.Parts.Length];
+
+        // the grid element at a slot's position, without a lambda (it runs every frame)
+        internal static InventoryElement ElementAt(List<InventoryElement> elements, Vector2i position)
+        {
+            foreach (var element in elements)
+                if (element != null && element.Position == position)
+                    return element;
+            return null;
+        }
+
         private static void UpdateButton(InventoryGrid grid, Part part)
         {
             var slot = ExtraSlots.API.FindSlot(CosmeticSlots.SlotId(part));
             if (slot == null || !slot.IsActive)
                 return;
-            var element = ElementsRef(grid).Find(e => e != null && e.Position == slot.GridPosition);
+            var element = ElementAt(ElementsRef(grid), slot.GridPosition);
             if (element == null)
                 return;
 
-            var button = element.transform.Find(ButtonName);
-            if (button == null)
-                button = Create(element, part);
+            var tag = Tags[(int)part] ?? (Tags[(int)part] = new Tag());
+            if (tag.Element != element || tag.Button == null)
+            {
+                var button = element.transform.Find(ButtonName);
+                if (button == null)
+                    button = Create(element, part);
+                tag.Element = element;
+                tag.Button = button;
+                tag.Text = button.GetComponentInChildren<TMP_Text>(true);
+                tag.Background = button.GetComponent<Image>();
+                tag.Tooltip = button.GetComponent<UITooltip>();
+                tag.Shown = (Look)(-1);
+            }
 
+            // label, color and hover text change only with the look
             var shown = CosmeticSlots.Shown(part);
-            var text = button.GetComponentInChildren<TMP_Text>(true);
-            if (text != null && text.text != Label(shown))
-                text.text = Label(shown);
-            var background = button.GetComponent<Image>();
-            if (background != null)
-                background.color = ColorOf(shown);
-            var tooltip = button.GetComponent<UITooltip>();
-            if (tooltip != null)
-                tooltip.m_text = Tooltip(part, shown);
+            if (shown != tag.Shown)
+            {
+                tag.Shown = shown;
+                if (tag.Text != null)
+                    tag.Text.text = Label(shown);
+                if (tag.Background != null)
+                    tag.Background.color = ColorOf(shown);
+                if (tag.Tooltip != null)
+                    tag.Tooltip.m_text = Tooltip(part, shown);
+            }
             // the grid redraws the icon every frame before this runs, so the fade never sticks to the item
             if (element.m_icon != null && element.m_icon.enabled && shown != Look.Cosmetic)
             {
@@ -110,7 +144,7 @@ namespace CosmeticArmor
                 c.a = FadedIcon;
                 element.m_icon.color = c;
             }
-            button.SetAsLastSibling();
+            tag.Button.SetAsLastSibling();
         }
 
         private static Transform Create(InventoryElement element, Part part)

@@ -69,7 +69,7 @@ namespace CosmeticArmor
                 var slot = ExtraSlots.API.FindSlot(CosmeticSlots.SlotId(part));
                 if (slot == null || !slot.IsActive)
                     continue;
-                var element = elements.Find(e => e != null && e.Position == slot.GridPosition);
+                var element = LookButtons.ElementAt(elements, slot.GridPosition);
                 if (element == null || !element.gameObject.activeInHierarchy)
                     continue;
                 ((RectTransform)element.transform).GetWorldCorners(Corners);

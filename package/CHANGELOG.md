@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+
+- Lighter on the game. The cosmetic slots no longer read their settings again every frame, so less memory churn while playing and with the inventory open.
+
 ## 1.0.0
 
 - First release.

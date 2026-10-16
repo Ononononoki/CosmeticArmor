@@ -21,7 +21,10 @@ namespace CosmeticArmor
         internal static Func<Dictionary<string, string>> SavedData = () => Player.m_localPlayer?.m_customData;
         internal static Func<ItemDrop.ItemData, bool> IsWorn = item => Player.m_localPlayer?.IsItemEquiped(item) == true;
 
-        internal static string SlotId(Part part) => "CosmeticArmor_" + part;
+        // built once, the slots and looks are read every frame
+        private static readonly string[] SlotIds = Parts.Select(p => "CosmeticArmor_" + p).ToArray();
+
+        internal static string SlotId(Part part) => SlotIds[(int)part];
 
         internal static ItemDrop.ItemData.ItemType TypeOf(Part part)
         {
@@ -73,21 +76,39 @@ namespace CosmeticArmor
             catch { return null; }
         }
 
-        internal static bool IsCosmeticItem(ItemDrop.ItemData item) =>
-            item != null && Parts.Any(p => ReferenceEquals(ItemIn(p), item));
+        // a piece only fits its own part's slot, so only that one slot is looked up (this runs for every item's weight)
+        internal static bool IsCosmeticItem(ItemDrop.ItemData item)
+        {
+            if (item?.m_shared == null)
+                return false;
+            var type = item.m_shared.m_itemType;
+            foreach (var part in Parts)
+                if (TypeOf(part) == type)
+                    return ReferenceEquals(ItemIn(part), item);
+            return false;
+        }
 
         internal static List<ItemDrop.ItemData> CosmeticItems() =>
             Parts.Select(ItemIn).Where(i => i != null).ToList();
 
-        // the chosen look per part, saved with the character as "0,0,0,0,0,0"
+        // the chosen look per part, saved with the character as "0,0,0,0,0,0". the text is parsed again only when it
+        // is another string than last time (a new choice, another character)
+        private static string _parsedFrom;
+        private static readonly Look[] Parsed = new Look[Parts.Length];
+
         internal static Look GetLook(Part part)
         {
             var data = SavedData();
             if (data == null || !data.TryGetValue(LooksKey, out var saved))
                 return Look.Cosmetic;
-            var parts = saved.Split(',');
-            int i = (int)part;
-            return i < parts.Length && int.TryParse(parts[i], out var v) && Enum.IsDefined(typeof(Look), v) ? (Look)v : Look.Cosmetic;
+            if (!ReferenceEquals(saved, _parsedFrom))
+            {
+                var parts = (saved ?? "").Split(',');
+                for (int i = 0; i < Parsed.Length; i++)
+                    Parsed[i] = i < parts.Length && int.TryParse(parts[i], out var v) && v >= (int)Look.Cosmetic && v <= (int)Look.Hidden ? (Look)v : Look.Cosmetic;
+                _parsedFrom = saved;
+            }
+            return Parsed[(int)part];
         }
 
         internal static void SetLook(Part part, Look look)
@@ -101,8 +122,11 @@ namespace CosmeticArmor
         }
 
         // what the part really shows: an empty slot can not show a cosmetic item, so it shows the armor
-        internal static Look Shown(Part part) =>
-            GetLook(part) == Look.Cosmetic && ItemIn(part) == null ? Look.Armor : GetLook(part);
+        internal static Look Shown(Part part)
+        {
+            var look = GetLook(part);
+            return look == Look.Cosmetic && ItemIn(part) == null ? Look.Armor : look;
+        }
 
         // the cycle button's order: cosmetic, armor, hidden. an empty slot only switches armor and hidden
         internal static Look Next(Look shown, bool hasItem)
