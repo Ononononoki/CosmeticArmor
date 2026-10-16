@@ -14,6 +14,7 @@ Your best armor is rarely your best look. Wear the Flametal for the stats and sh
   - **Show** (gold): the cosmetic item
   - **Armor** (blue): your worn armor, the cosmetic item's icon fades
   - **Hide** (red): nothing at all (no helmet hair, finally)
+- **Works with ExtraSlots' extra utility slots.** The Utility tag covers every utility item you wear, not only the first one.
 - **No weight.** Cosmetic items weigh nothing.
 - **Kept on death.** Cosmetic items stay with you when you die. A config option sends them to your grave instead.
 - **Everyone sees it.** Other players see your look even if they do not have the mod.

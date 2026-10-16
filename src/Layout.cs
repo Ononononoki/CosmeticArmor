@@ -81,13 +81,21 @@ namespace CosmeticArmor
                 right = Mathf.Max(right, p.x);
             }
 
-            // rows: the first armor slot is the top of its column, the next slot in that column gives the step
-            float top = equipment[0].Pos.y;
-            var firstColumn = equipment.Where(s => Col(s.Pos) == Col(equipment[0].Pos)).ToList();
-            float rowStep = firstColumn.Count > 1 ? firstColumn[1].Pos.y - firstColumn[0].Pos.y : -tile;
+            // rows: the highest armor row is the top, the smallest gap between two row heights the step down.
+            // ExtraSlots' list is not always top to bottom (not with its extra utility slots on), so heights decide
+            var grid = regular.Count > 0 ? regular : equipment;
+            var heights = grid.Select(s => s.Pos.y).OrderByDescending(y => y).ToList();
+            float top = heights[0];
+            float gap = 0f;
+            for (int i = 1; i < heights.Count; i++)
+            {
+                float d = heights[i - 1] - heights[i];
+                if (d > 1f && (gap == 0f || d < gap)) gap = d;
+            }
+            float rowStep = gap > 0f ? -gap : -tile;
 
             // the group fills columns top to bottom with as many rows as ExtraSlots' armor grid has (at least 2)
-            int rows = Math.Max(2, equipment.Select(s => Mathf.RoundToInt((s.Pos.y - top) / rowStep)).Distinct().Count());
+            int rows = Math.Max(2, grid.Select(s => Mathf.RoundToInt((s.Pos.y - top) / rowStep)).Distinct().Count());
             int columns = (ours.Count + rows - 1) / rows;
             float start = right + tile * (1f + Gap);
             for (int i = 0; i < ours.Count; i++)

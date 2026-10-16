@@ -1,10 +1,10 @@
 {
   "name": "CosmeticArmor",
-  "version_number": "1.0.1",
+  "version_number": "1.0.2",
   "website_url": "https://github.com/Ononononoki/CosmeticArmor",
   "description": "Remember Cosmetic Armor from Minecraft? It's in Valheim now! An ExtraSlots add-on with 6 cosmetic slots. Keep your best armor's stats and flex your fanciest set, even mid-fight.",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2351",
-    "shudnal-ExtraSlots-1.2.19"
+    "shudnal-ExtraSlots-1.2.20"
   ]
 }

@@ -17,7 +17,7 @@ namespace CosmeticArmor
     {
         public const string ModGuid = "onononoki.CosmeticArmor";
         public const string ModName = "CosmeticArmor";
-        public const string ModVersion = "1.0.1";
+        public const string ModVersion = "1.0.2";
         internal const string ExtraSlotsGuid = "shudnal.ExtraSlots";
 
         internal static ManualLogSource Log;
@@ -53,6 +53,7 @@ namespace CosmeticArmor
             var harmony = new Harmony(ModGuid);
             harmony.PatchAll(Assembly.GetExecutingAssembly());
             Layout.Patch(harmony);
+            CustomSlotItems.Patch(harmony);
             Log.LogInfo($"{ModName} {ModVersion} loaded");
         }
     }
