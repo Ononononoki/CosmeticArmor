@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+- Fixed the font warnings of the Cosmetic title and the Show, Armor and Hide tags in the log. They look the same as before.
+
 ## 1.0.2
 
 - Fixed ExtraSlots' extra utility slots. With the cosmetic slots installed, a second utility item (like a belt together with a Wisplight) could no longer be worn.

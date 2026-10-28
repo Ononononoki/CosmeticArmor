@@ -90,6 +90,8 @@ namespace CosmeticArmor
         private static Transform Create(RectTransform panel, TMP_FontAsset font)
         {
             var go = new GameObject(TitleName, typeof(RectTransform));
+            // made inactive so the text wakes up with the game's font already set, not looking for TextMesh Pro's default one
+            go.SetActive(false);
             var rect = (RectTransform)go.transform;
             rect.SetParent(panel, false);
             rect.pivot = new Vector2(0.5f, 0f);
@@ -106,6 +108,7 @@ namespace CosmeticArmor
             tmp.overflowMode = TextOverflowModes.Overflow;
             // clicks go through to the panel (ExtraSlots drags the panel by its background)
             tmp.raycastTarget = false;
+            go.SetActive(true);
             return go.transform;
         }
     }

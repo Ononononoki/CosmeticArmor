@@ -162,6 +162,8 @@ namespace CosmeticArmor
 
             // its own text in the game's font (taken from the slot's quality number), white and bold
             var label = new GameObject("Label", typeof(RectTransform));
+            // made inactive so the text wakes up with the game's font already set, not looking for TextMesh Pro's default one
+            label.SetActive(false);
             var lr = (RectTransform)label.transform;
             lr.SetParent(rect, false);
             lr.anchorMin = Vector2.zero;
@@ -176,6 +178,7 @@ namespace CosmeticArmor
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.textWrappingMode = TextWrappingModes.NoWrap;
             tmp.raycastTarget = false;
+            label.SetActive(true);
 
             // the hover text copies the slot's own tooltip setup
             if (element.m_tooltip != null)

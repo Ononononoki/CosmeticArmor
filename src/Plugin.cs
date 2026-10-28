@@ -17,7 +17,7 @@ namespace CosmeticArmor
     {
         public const string ModGuid = "onononoki.CosmeticArmor";
         public const string ModName = "CosmeticArmor";
-        public const string ModVersion = "1.0.2";
+        public const string ModVersion = "1.0.3";
         internal const string ExtraSlotsGuid = "shudnal.ExtraSlots";
 
         internal static ManualLogSource Log;
